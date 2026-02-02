@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Kết quả của bạn"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CĂNG THẲNG TRUNG BÌNH"
+        android:textColor="#FF9800"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Biểu đồ theo dõi:"
+        android:layout_marginBottom="5dp"/>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="#FFFFFF"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:id="@+id/tvAnalysis"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đánh giá từ AI: Bạn đang có dấu hiệu mệt mỏi do công việc. Cần nghỉ ngơi ngay lập tức."
+        android:layout_marginTop="20dp"
+        android:textSize="16sp"
+        android:lineSpacingExtra="4dp"/>
+
+    <Button
+        android:id="@+id/btnGoTherapy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tiến hành cải thiện ngay"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="#4CAF50"/>
+
+</LinearLayout>

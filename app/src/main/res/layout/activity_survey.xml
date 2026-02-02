@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bài kiểm tra mức độ căng thẳng"
+        android:padding="16dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:background="#E3F2FD"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvQuestions"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp"/>
+
+    <Button
+        android:id="@+id/btnSubmitSurvey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hoàn thành &amp; Phân tích"
+        android:layout_margin="16dp"
+        android:backgroundTint="#2196F3"
+        android:padding="15dp"/>
+
+</LinearLayout>
