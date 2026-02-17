@@ -4,14 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp"
-    android:fitsSystemWindows="true"
     android:gravity="center">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bạn cảm thấy thế nào?"
-        android:textSize="24sp"
+        android:text="Bạn cảm thấy thế nào sau bài tập?"
+        android:textSize="22sp"
         android:textStyle="bold"
         android:layout_marginBottom="30dp"/>
 
@@ -22,28 +21,38 @@
         android:layout_marginBottom="30dp">
 
         <RadioButton
-            android:id="@+id/rbBetter"
-            android:text="Tôi thấy Tốt hơn nhiều"
-            android:textSize="18sp"
-            android:padding="10dp"
+            android:id="@+id/rbMuchBetter"
+            android:text="Tốt hơn rất nhiều (Giảm mạnh)"
+            android:layout_height="100px"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:padding="10dp"/>
+
+        <RadioButton
+            android:id="@+id/rbBetter"
+            android:text="Khá hơn một chút (Giảm nhẹ)"
+            android:layout_height="100px"
+            android:layout_width="match_parent"
+            android:padding="10dp"/>
 
         <RadioButton
             android:id="@+id/rbSame"
-            android:text="Vẫn như cũ"
-            android:textSize="18sp"
-            android:padding="10dp"
+            android:text="Không thay đổi"
+            android:layout_height="100px"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:padding="10dp"/>
+
+        <RadioButton
+            android:id="@+id/rbWorse"
+            android:text="Tệ hơn (Căng thẳng thêm)"
+            android:layout_height="100px"
+            android:layout_width="match_parent"
+            android:padding="10dp"/>
     </RadioGroup>
 
     <Button
         android:id="@+id/btnFinish"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cập nhật trạng thái"
-        android:backgroundTint="#FF5722"
-        android:padding="15dp"/>
-
+        android:text="Gửi đánh giá"
+        android:backgroundTint="#FF5722"/>
 </LinearLayout>

@@ -6,6 +6,7 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/tvLayerTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Bài kiểm tra mức độ căng thẳng"

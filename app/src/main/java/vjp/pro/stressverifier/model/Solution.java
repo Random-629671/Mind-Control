@@ -6,7 +6,7 @@ public class Solution {
     public String title;
     public String content;
     public SolutionType type;
-
+    public boolean isPerformed = false;
     public Solution(String title, String content, SolutionType type) {
         this.title = title;
         this.content = content;

@@ -25,7 +25,6 @@ import vjp.pro.stressverifier.data.DatabaseHelper;
 import vjp.pro.stressverifier.model.HistoryItem;
 
 public class MainActivity extends AppCompatActivity {
-
     private CardView btnStartSurvey;
     private Button btnViewHistory;
     private ImageButton btnSettings;
@@ -76,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         int sum = 0;
         for (HistoryItem item : history) {
-            sum += item.score;
+            sum += item.scoreAfter;
         }
         int avg = sum / history.size();
 
@@ -96,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(50, 20, 50, 20);
 
+        SharedPreferences prefs = getSharedPreferences("AppConfig", MODE_PRIVATE);
+        String currentKey = prefs.getString("API_KEY", "");
+
         Switch switchAI = new Switch(this);
         switchAI.setText("Chế độ phân tích AI");
         switchAI.setChecked(isUseAI);
@@ -107,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         etApiKey.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
+        etApiKey.setText(currentKey);
         layout.addView(etApiKey);
 
         builder.setView(layout);
@@ -117,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
             SharedPreferences.Editor editor = getSharedPreferences("AppConfig", MODE_PRIVATE).edit();
             editor.putBoolean("USE_AI", isUseAI);
+            editor.putString("API_KEY", apiKey);
             editor.apply();
 
             Toast.makeText(this, "Đã lưu cấu hình", Toast.LENGTH_SHORT).show();

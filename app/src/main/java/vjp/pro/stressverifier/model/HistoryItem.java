@@ -1,11 +1,13 @@
 package vjp.pro.stressverifier.model;
 
 public class HistoryItem {
-    public int score;
+    public int scoreBefore;
+    public int scoreAfter;
     public long timestamp;
 
-    public HistoryItem(int score, long timestamp) {
-        this.score = score;
+    public HistoryItem(int scoreBefore, int scoreAfter, long timestamp) {
+        this.scoreBefore = scoreBefore;
+        this.scoreAfter = scoreAfter;
         this.timestamp = timestamp;
     }
 }

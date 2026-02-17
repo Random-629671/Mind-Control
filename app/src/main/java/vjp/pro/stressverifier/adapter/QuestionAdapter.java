@@ -22,9 +22,7 @@ import vjp.pro.stressverifier.R;
 public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> {
 
     private List<Question> questionList;
-
     private Map<Integer, Integer> scores = new HashMap<>();
-
     private String textAnswer = "";
 
     public QuestionAdapter(List<Question> questionList) {
@@ -51,11 +49,18 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         Question question = questionList.get(position);
         holder.tvContent.setText("Câu " + (position + 1) + ": " + question.content);
 
+        if (holder.textWatcher != null) {
+            holder.etAnswer.removeTextChangedListener(holder.textWatcher);
+        }
+        holder.rgOptions.setOnCheckedChangeListener(null);
+
         if (question.isTextQuestion) {
             holder.rgOptions.setVisibility(View.GONE);
             holder.etAnswer.setVisibility(View.VISIBLE);
 
-            holder.etAnswer.addTextChangedListener(new TextWatcher() {
+            holder.etAnswer.setText(textAnswer);
+
+            holder.textWatcher = new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
                 @Override
@@ -64,13 +69,12 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 public void afterTextChanged(Editable s) {
                     textAnswer = s.toString();
                 }
-            });
+            };
+            holder.etAnswer.addTextChangedListener(holder.textWatcher);
 
         } else {
             holder.rgOptions.setVisibility(View.VISIBLE);
             holder.etAnswer.setVisibility(View.GONE);
-
-            holder.rgOptions.setOnCheckedChangeListener(null);
 
             holder.rgOptions.clearCheck();
             if (scores.containsKey(question.id)) {
@@ -106,6 +110,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         TextView tvContent;
         RadioGroup rgOptions;
         EditText etAnswer;
+        TextWatcher textWatcher;
 
         public QuestionViewHolder(@NonNull View itemView) {
             super(itemView);
