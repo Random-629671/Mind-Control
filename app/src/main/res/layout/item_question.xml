@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:elevation="2dp">
+    android:elevation="2dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"
+    app:strokeWidth="0dp"
+    app:strokeColor="@color/red_error_color">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,11 +30,6 @@
             android:id="@+id/rgOptions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <RadioButton android:id="@+id/rbOp0" android:text="Không bao giờ (0)" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <RadioButton android:id="@+id/rbOp1" android:text="Hiếm khi (1)" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <RadioButton android:id="@+id/rbOp2" android:text="Thỉnh thoảng (2)" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <RadioButton android:id="@+id/rbOp3" android:text="Khá thường xuyên (3)" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <RadioButton android:id="@+id/rbOp4" android:text="Rất thường xuyên (4)" android:layout_width="match_parent" android:layout_height="wrap_content"/>
         </RadioGroup>
 
         <EditText
@@ -42,4 +43,4 @@
             android:visibility="gone"/>
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

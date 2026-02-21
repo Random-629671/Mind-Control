@@ -2,7 +2,9 @@ package vjp.pro.stressverifier.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,13 +24,20 @@ import vjp.pro.stressverifier.R;
 import vjp.pro.stressverifier.activity.HistoryActivity;
 import vjp.pro.stressverifier.activity.SurveyActivity;
 import vjp.pro.stressverifier.data.DatabaseHelper;
+import vjp.pro.stressverifier.enums.StressLevel;
+import vjp.pro.stressverifier.logic.SurveyManager;
 import vjp.pro.stressverifier.model.HistoryItem;
+
+import android.graphics.drawable.GradientDrawable;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 public class MainActivity extends AppCompatActivity {
     private CardView btnStartSurvey;
     private Button btnViewHistory;
     private ImageButton btnSettings;
     private TextView tvSummary;
+    private View viewBackgroundCircle;
 
     private boolean isUseAI = false;
 
@@ -41,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         btnViewHistory = findViewById(R.id.btnViewHistory);
         btnSettings = findViewById(R.id.btnSettings);
         tvSummary = findViewById(R.id.tvSummary);
+
+        SurveyManager.getInstance().initData(this);
 
         SharedPreferences prefs = getSharedPreferences("AppConfig", MODE_PRIVATE);
         isUseAI = prefs.getBoolean("USE_AI", false);
@@ -61,15 +72,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        updateSummary();
+        UpdateSummaryAndBackground();
     }
 
-    private void updateSummary() {
+    private void UpdateSummaryAndBackground() {
         DatabaseHelper db = new DatabaseHelper(this);
         List<HistoryItem> history = db.getLastHistory(5);
 
         if (history.isEmpty()) {
             tvSummary.setText("Chưa có dữ liệu. Hãy làm bài test đầu tiên!");
+            //setEclipseColor(StressLevel.NONE.color);
             return;
         }
 
@@ -77,14 +89,38 @@ public class MainActivity extends AppCompatActivity {
         for (HistoryItem item : history) {
             sum += item.scoreAfter;
         }
-        int avg = sum / history.size();
+        int percentage = sum / history.size();
 
-        String status = "";
-        if (avg <= 13) status = "Tốt (Thấp)";
-        else if (avg <= 26) status = "Cần chú ý (Trung bình)";
-        else status = "Báo động (Cao)";
+        StressLevel level;
+        if (percentage <= 10) level = StressLevel.NONE;
+        else if (percentage <= 35) level = StressLevel.LOW;
+        else if (percentage <= 65) level = StressLevel.MEDIUM;
+        else if (percentage <= 85) level = StressLevel.HIGH;
+        else level = StressLevel.EXTREME;
 
-        tvSummary.setText("Trung bình 5 lần gần nhất: " + avg + "/40\nTình trạng: " + status);
+        tvSummary.setText("TB 5 lần gần nhất: " + percentage + "%\nTình trạng: " + level.label);
+        tvSummary.setTextColor(level.color);
+
+        //setEclipseColor(level.color);
+        btnStartSurvey.setCardBackgroundColor(level.color);
+    }
+
+    // Todo / Error: This func broken!
+    // Warn: It cause crash, not use it!
+    private void setEclipseColor(int color) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        float radius = displayMetrics.widthPixels / 1.5f;
+
+        int alphaColor = Color.argb(120, Color.red(color), Color.green(color), Color.blue(color));
+
+        GradientDrawable gd = new GradientDrawable();
+        gd.setShape(GradientDrawable.OVAL);
+        gd.setGradientType(GradientDrawable.RADIAL_GRADIENT);
+        gd.setGradientRadius(radius);
+        gd.setColors(new int[]{ Color.TRANSPARENT, alphaColor, Color.TRANSPARENT });
+
+        viewBackgroundCircle.setBackground(gd);
     }
 
     private void showSettingsDialog() {
@@ -105,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(switchAI);
 
         EditText etApiKey = new EditText(this);
-        etApiKey.setHint("Nhập API Key (OpenAI/Gemini)");
+        etApiKey.setHint("Nhập API Key");
         etApiKey.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -114,6 +150,20 @@ public class MainActivity extends AppCompatActivity {
 
         builder.setView(layout);
 
+        TextView tvProvider = new TextView(this);
+        tvProvider.setText("Chọn AI Provider:");
+        tvProvider.setPadding(0, 20, 0, 10);
+        layout.addView(tvProvider);
+
+        Spinner spinnerProvider = new Spinner(this);
+        String[] providers = new String[]{"Google Gemini", "OpenAI (Coming Soon)"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, providers);
+        spinnerProvider.setAdapter(adapter);
+        layout.addView(spinnerProvider);
+
+        int savedProvIdx = prefs.getInt("PROVIDER_IDX", 0);
+        spinnerProvider.setSelection(savedProvIdx);
+
         builder.setPositiveButton("Lưu", (dialog, which) -> {
             isUseAI = switchAI.isChecked();
             String apiKey = etApiKey.getText().toString();
@@ -121,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = getSharedPreferences("AppConfig", MODE_PRIVATE).edit();
             editor.putBoolean("USE_AI", isUseAI);
             editor.putString("API_KEY", apiKey);
+            editor.putInt("PROVIDER_IDX", spinnerProvider.getSelectedItemPosition());
             editor.apply();
 
             Toast.makeText(this, "Đã lưu cấu hình", Toast.LENGTH_SHORT).show();

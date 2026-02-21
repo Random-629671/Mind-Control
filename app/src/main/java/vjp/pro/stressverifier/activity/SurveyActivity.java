@@ -1,10 +1,10 @@
 package vjp.pro.stressverifier.activity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,8 +18,12 @@ import vjp.pro.stressverifier.R;
 import vjp.pro.stressverifier.adapter.QuestionAdapter;
 import vjp.pro.stressverifier.logic.SurveyManager;
 import vjp.pro.stressverifier.model.AssessmentResult;
+import vjp.pro.stressverifier.model.Question;
 import vjp.pro.stressverifier.model.StressEvaluator;
 import vjp.pro.stressverifier.model.SurveyStage;
+
+import android.widget.ImageButton;
+import androidx.appcompat.app.AlertDialog;
 
 public class SurveyActivity extends AppCompatActivity {
     private RecyclerView rvQuestions;
@@ -27,8 +31,7 @@ public class SurveyActivity extends AppCompatActivity {
     private TextView tvLayerTitle;
     private QuestionAdapter adapter;
     private SurveyManager surveyManager;
-    private ProgressDialog progressDialog;
-    // Todo: Verify if 'ProgressDialog' is fully deprecated and perform a replacement.
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class SurveyActivity extends AppCompatActivity {
         rvQuestions = findViewById(R.id.rvQuestions);
         btnNext = findViewById(R.id.btnSubmitSurvey);
         tvLayerTitle = findViewById(R.id.tvLayerTitle);
+        progressBar = findViewById(R.id.loadingBar);
 
         surveyManager = SurveyManager.getInstance();
         surveyManager.initData(this);
@@ -45,6 +49,16 @@ public class SurveyActivity extends AppCompatActivity {
         setupCurrentStage();
 
         btnNext.setOnClickListener(v -> handleNextStep());
+
+        ImageButton btnClose = findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Thoát bài kiểm tra?")
+                    .setMessage("Tiến trình hiện tại sẽ không được lưu lại. Bạn có chắc chắn muốn thoát?")
+                    .setPositiveButton("Thoát", (dialog, which) -> finish())
+                    .setNegativeButton("Hủy", null)
+                    .show();
+        });
     }
 
     private void setupCurrentStage() {
@@ -72,10 +86,18 @@ public class SurveyActivity extends AppCompatActivity {
     private void handleNextStep() {
         Map<Integer, Integer> currentScores = adapter.getScores();
         SurveyStage currentStage = surveyManager.getCurrentStage();
+        boolean hasError = false;
 
-        long required = currentStage.questions.stream().filter(q -> !q.isTextQuestion).count();
-        if (currentScores.size() < required) {
-            Toast.makeText(this, "Vui lòng trả lời hết các câu hỏi trắc nghiệm!", Toast.LENGTH_SHORT).show();
+        for (int i = 0; i < currentStage.questions.size(); i++) {
+            Question q = currentStage.questions.get(i);
+            if (!q.isTextQuestion && !currentScores.containsKey(q.id)) {
+                adapter.markError(i);
+                hasError = true;
+            }
+        }
+
+        if (hasError) {
+            Toast.makeText(this, "Vui lòng hoàn thành các câu hỏi được tô đỏ!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -90,33 +112,34 @@ public class SurveyActivity extends AppCompatActivity {
     }
 
     private void finishSurvey() {
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Đang tổng hợp kết quả & phân tích...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        progressBar.setVisibility(View.VISIBLE);
         btnNext.setEnabled(false);
+        rvQuestions.setAlpha(0.5f);
 
         StressEvaluator evaluator = new StressEvaluator(this);
 
-        evaluator.evaluate(surveyManager.getTotalScore(), surveyManager.getCombinedTextAnswers(),
-                new StressEvaluator.EvaluationCallback() {
-                    @Override
-                    public void onSuccess(AssessmentResult result) {
-                        if (progressDialog.isShowing()) progressDialog.dismiss();
-                        Intent intent = new Intent(SurveyActivity.this, ResultActivity.class);
-                        intent.putExtra("SCORE", result.score);
-                        intent.putExtra("LEVEL_NAME", result.level.name());
-                        intent.putExtra("ANALYSIS", result.analysis);
-                        startActivity(intent);
-                        finish();
-                    }
+        evaluator.evaluate(surveyManager.getTotalScore(),
+            surveyManager.getTotalMaxScore(),
+            surveyManager.getCombinedTextAnswers(),
+            new StressEvaluator.EvaluationCallback() {
+                @Override
+                public void onSuccess(AssessmentResult result) {
+                    progressBar.setVisibility(View.GONE);
+                    Intent intent = new Intent(SurveyActivity.this, ResultActivity.class);
+                    intent.putExtra("SCORE", result.score);
+                    intent.putExtra("LEVEL_NAME", result.level.name());
+                    intent.putExtra("ANALYSIS", result.analysis);
+                    startActivity(intent);
+                    finish();
+                }
 
-                    @Override
-                    public void onError(String error) {
-                        if (progressDialog.isShowing()) progressDialog.dismiss();
-                        Toast.makeText(SurveyActivity.this, "Lỗi: " + error, Toast.LENGTH_LONG).show();
-                        btnNext.setEnabled(true);
-                    }
-                });
+                @Override
+                public void onError(String error) {
+                    progressBar.setVisibility(View.GONE);
+                    rvQuestions.setAlpha(1f);
+                    btnNext.setEnabled(true);
+                    Toast.makeText(SurveyActivity.this, error, Toast.LENGTH_LONG).show();
+                }
+            });
     }
 }

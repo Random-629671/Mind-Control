@@ -1,11 +1,14 @@
 package vjp.pro.stressverifier.adapter;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -19,8 +22,9 @@ import java.util.Map;
 import vjp.pro.stressverifier.model.Question;
 import vjp.pro.stressverifier.R;
 
-public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> {
+import com.google.android.material.card.MaterialCardView;
 
+public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> {
     private List<Question> questionList;
     private Map<Integer, Integer> scores = new HashMap<>();
     private String textAnswer = "";
@@ -37,6 +41,11 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         return textAnswer;
     }
 
+    public void markError(int position) {
+        questionList.get(position).hasError = true;
+        notifyItemChanged(position);
+    }
+
     @NonNull
     @Override
     public QuestionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -47,7 +56,19 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
     @Override
     public void onBindViewHolder(@NonNull QuestionViewHolder holder, int position) {
         Question question = questionList.get(position);
+        Context context = holder.itemView.getContext();
         holder.tvContent.setText("Câu " + (position + 1) + ": " + question.content);
+
+        if (question.hasError) {
+            holder.cardView.setStrokeColor(Color.RED);
+            holder.cardView.setStrokeWidth(4);
+        } else {
+            holder.cardView.setStrokeColor(Color.TRANSPARENT);
+            holder.cardView.setStrokeWidth(0);
+        }
+
+        holder.rgOptions.setOnCheckedChangeListener(null);
+        holder.rgOptions.removeAllViews();
 
         if (holder.textWatcher != null) {
             holder.etAnswer.removeTextChangedListener(holder.textWatcher);
@@ -71,33 +92,30 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 }
             };
             holder.etAnswer.addTextChangedListener(holder.textWatcher);
-
         } else {
             holder.rgOptions.setVisibility(View.VISIBLE);
             holder.etAnswer.setVisibility(View.GONE);
 
-            holder.rgOptions.clearCheck();
-            if (scores.containsKey(question.id)) {
-                int score = scores.get(question.id);
-                switch (score) {
-                    case 0: holder.rgOptions.check(R.id.rbOp0); break;
-                    case 1: holder.rgOptions.check(R.id.rbOp1); break;
-                    case 2: holder.rgOptions.check(R.id.rbOp2); break;
-                    case 3: holder.rgOptions.check(R.id.rbOp3); break;
-                    case 4: holder.rgOptions.check(R.id.rbOp4); break;
+            if (question.options != null) {
+                for (Question.Option option : question.options) {
+                    RadioButton rb = new RadioButton(context);
+                    rb.setText(option.text);
+                    rb.setId(View.generateViewId());
+                    rb.setPadding(0, 10, 0, 10);
+
+                    holder.rgOptions.addView(rb);
+
+                    if (scores.containsKey(question.id) && scores.get(question.id) == option.score) {
+                        rb.setChecked(true);
+                    }
+
+                    rb.setOnClickListener(v -> {
+                        scores.put(question.id, option.score);
+                        question.hasError = false;
+                        holder.cardView.setStrokeColor(Color.TRANSPARENT);
+                    });
                 }
             }
-
-            holder.rgOptions.setOnCheckedChangeListener((group, checkedId) -> {
-                int score = 0;
-                if (checkedId == R.id.rbOp0) score = 0;
-                else if (checkedId == R.id.rbOp1) score = 1;
-                else if (checkedId == R.id.rbOp2) score = 2;
-                else if (checkedId == R.id.rbOp3) score = 3;
-                else if (checkedId == R.id.rbOp4) score = 4;
-
-                scores.put(question.id, score);
-            });
         }
     }
 
@@ -107,6 +125,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
     }
 
     public static class QuestionViewHolder extends RecyclerView.ViewHolder {
+        MaterialCardView cardView;
         TextView tvContent;
         RadioGroup rgOptions;
         EditText etAnswer;
@@ -114,6 +133,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
 
         public QuestionViewHolder(@NonNull View itemView) {
             super(itemView);
+            cardView = (MaterialCardView) itemView;
             tvContent = itemView.findViewById(R.id.tvQuestionContent);
             rgOptions = itemView.findViewById(R.id.rgOptions);
             etAnswer = itemView.findViewById(R.id.etAnswer);

@@ -13,11 +13,15 @@ public class StressEvaluator {
         this.context = context;
     }
 
-    public void evaluate(int totalScore, String textNotes, EvaluationCallback callback) {
+    public void evaluate(int totalScore, int maxPossibleScore, String textNotes, EvaluationCallback callback) {
+        double percentage = (maxPossibleScore > 0) ? ((double) totalScore / maxPossibleScore) * 100 : 0;
+
         StressLevel level;
-        if (totalScore <= 30) level = StressLevel.LOW;
-        else if (totalScore <= 60) level = StressLevel.MEDIUM;
-        else level = StressLevel.HIGH;
+        if (percentage <= 10) level = StressLevel.NONE;
+        else if (percentage <= 35) level = StressLevel.LOW;
+        else if (percentage <= 65) level = StressLevel.MEDIUM;
+        else if (percentage <= 85) level = StressLevel.HIGH;
+        else level = StressLevel.EXTREME;
 
         List<Solution> solutions = MockDataStore.getSolutions(level);
 
@@ -25,16 +29,17 @@ public class StressEvaluator {
             @Override
             public void onSuccess(AiResponse response) {
                 AssessmentResult result = new AssessmentResult(
-                        totalScore, level, response.analysis, solutions
+                        (int) percentage, level, response.analysis, solutions
                 );
                 callback.onSuccess(result);
             }
 
             @Override
             public void onError(String error) {
-                String fallbackText = "Đánh giá cơ bản (AI tắt/lỗi): Mức độ " + level.name();
+                String fallbackText = "Đánh giá (AI Off): " + level.label + "\n" +
+                        "Tỉ lệ stress: " + String.format("%.1f", percentage) + "%";
                 AssessmentResult result = new AssessmentResult(
-                        totalScore, level, fallbackText, solutions
+                        (int) percentage, level, fallbackText, solutions
                 );
                 callback.onSuccess(result);
             }

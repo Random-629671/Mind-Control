@@ -12,12 +12,14 @@ import vjp.pro.stressverifier.data.MockDataStore;
 import vjp.pro.stressverifier.model.Question;
 import vjp.pro.stressverifier.model.SurveyStage;
 
+import java.util.Collections;
 public class SurveyManager {
     private static SurveyManager instance;
     private List<SurveyStage> stages;
     private int currentStageIndex = 0;
     private Map<Integer, Integer> scoreMap = new HashMap<>();
     private Map<Integer, String> textAnswerMap = new HashMap<>();
+    private int totalMaxScore = 0;
 
     private SurveyManager() {}
 
@@ -40,19 +42,44 @@ public class SurveyManager {
         stages = new ArrayList<>();
 
         for (SurveyStage stage : rawStages) {
-            List<Question> filteredQuestions = new ArrayList<>();
+            List<Question> validQuestions = new ArrayList<>();
             for (Question q : stage.questions) {
                 if (q.isTextQuestion && !useAI) {
                     continue;
                 }
-                filteredQuestions.add(q);
+                validQuestions.add(q);
             }
 
-            if (!filteredQuestions.isEmpty()) {
-                stages.add(new SurveyStage(stage.stageId, stage.title, stage.description, filteredQuestions));
+            if (validQuestions.isEmpty()) continue;
+
+            Collections.shuffle(validQuestions);
+
+            int limit = stage.maxQuestions;
+            if (limit > 0 && limit < validQuestions.size()) {
+                validQuestions = validQuestions.subList(0, limit);
+            }
+
+            // Thêm vào list chính thức
+            stages.add(new SurveyStage(stage.stageId, stage.title, stage.description, validQuestions, limit));
+        }
+
+        calculateTotalPossibleScore();
+    }
+
+    private void calculateTotalPossibleScore() {
+        totalMaxScore = 0;
+        for(SurveyStage stage : stages) {
+            for(Question q : stage.questions) {
+                if(!q.isTextQuestion && q.options != null) {
+                    int max = 0;
+                    for(Question.Option o : q.options) max = Math.max(max, o.score);
+                    totalMaxScore += max;
+                }
             }
         }
     }
+
+    public int getTotalMaxScore() { return totalMaxScore; }
 
     public SurveyStage getCurrentStage() {
         if (stages != null && currentStageIndex < stages.size()) {

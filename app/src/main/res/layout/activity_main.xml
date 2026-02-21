@@ -8,6 +8,18 @@
     android:fitsSystemWindows="true"
     tools:context=".activity.MainActivity">
 
+    <View
+        android:id="@+id/viewBackgroundCircle"
+        android:layout_width="1600dp"
+        android:layout_height="1600dp"
+        android:background="@drawable/bg_eclipse_gradient"
+        android:alpha="0.8"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
     <ImageButton
         android:id="@+id/btnSettings"
         android:layout_width="48dp"
@@ -22,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Stress Monitor"
-        android:textSize="28sp"
+        android:textSize="36sp"
         android:textStyle="bold"
         android:textColor="#333333"
         app:layout_constraintTop_toTopOf="parent"
@@ -32,11 +44,11 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/btnStartSurvey"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        app:cardCornerRadius="100dp"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
+        app:cardCornerRadius="130dp"
         app:cardBackgroundColor="#4CAF50"
-        app:cardElevation="8dp"
+        app:cardElevation="12dp"
         app:layout_constraintVertical_bias="0.4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -49,7 +61,7 @@
             android:text="BẮT ĐẦU\nTEST"
             android:gravity="center"
             android:textColor="#FFFFFF"
-            android:textSize="24sp"
+            android:textSize="44sp"
             android:textStyle="bold"
             android:layout_gravity="center"/>
     </androidx.cardview.widget.CardView>
@@ -58,13 +70,14 @@
         android:id="@+id/tvSummary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chưa có dữ liệu đo gần đây"
+        android:text="Đang tải dữ liệu..."
         android:gravity="center"
-        android:textSize="16sp"
-        android:padding="10dp"
-        android:background="#F5F5F5"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#455A64"
+        android:background="@android:color/transparent"
         app:layout_constraintTop_toBottomOf="@+id/btnStartSurvey"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -74,6 +87,7 @@
         android:layout_height="wrap_content"
         android:text="Xem biểu đồ lịch sử"
         android:layout_marginBottom="40dp"
+        android:textSize="60px"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
