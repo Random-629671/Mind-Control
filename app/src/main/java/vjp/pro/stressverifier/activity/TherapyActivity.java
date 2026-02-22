@@ -35,7 +35,6 @@ public class TherapyActivity extends AppCompatActivity {
         rvSolutions.setLayoutManager(new LinearLayoutManager(this));
         rvSolutions.setAdapter(adapter);
 
-        // Nút Skip: Về thẳng Main, clear task cũ
         btnSkip.setOnClickListener(v -> {
             Intent intent = new Intent(TherapyActivity.this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

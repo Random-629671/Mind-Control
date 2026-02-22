@@ -14,6 +14,7 @@ public class AiManager {
     private IAiProvider currentProvider;
     private String cachedApiKey = "";
 
+    // Todo: change this inital prompt to something more appropriate.
     private static final String SYSTEM_PROMPT =
             "You are a mental health assistant. Analyze the user's stress level based on their score and notes. " +
                     "The max score is around 120. " +

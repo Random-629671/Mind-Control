@@ -32,10 +32,11 @@ public class GeminiProvider implements IAiProvider {
     public void fetchRawResponse(String prompt, InternalCallback callback) {
         new Thread(() -> {
             try {
+                String overridePrompt = prompt; // Todo: Override inital prompt here.
                 Log.d(TAG, "Bắt đầu gọi API với Key: " + apiKey.substring(0, 5) + "...");
 
                 JSONObject userPart = new JSONObject();
-                userPart.put("text", prompt);
+                userPart.put("text", overridePrompt);
 
                 JSONObject parts = new JSONObject();
                 parts.put("parts", new JSONArray().put(userPart));

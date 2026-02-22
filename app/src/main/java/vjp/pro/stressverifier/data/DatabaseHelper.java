@@ -57,23 +57,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void deleteRecord(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_HISTORY, "id = ?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
     public List<HistoryItem> getLastHistory(int limit) {
         List<HistoryItem> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_HISTORY,
-                new String[]{"score_before", "score_after", "timestamp"},
-                null, null, null, null, "id DESC", String.valueOf(limit));
+                new String[]{"id", "score_before", "score_after", "timestamp"},
+                null, null, null, null, "timestamp DESC", String.valueOf(limit));
 
         if (cursor.moveToFirst()) {
             do {
-                int scoreBefore = cursor.getInt(0);
-                int scoreAfter = cursor.getInt(1);
-                long time = cursor.getLong(2);
-                list.add(0, new HistoryItem(scoreBefore, scoreAfter, time));
+                long id = cursor.getLong(0);
+                int scoreBefore = cursor.getInt(1);
+                int scoreAfter = cursor.getInt(2);
+                long time = cursor.getLong(3);
+                list.add(0, new HistoryItem(id, scoreBefore, scoreAfter, time));
             } while (cursor.moveToNext());
         }
         cursor.close();
         return list;
+    }
+
+    public void clearAllHistory() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_HISTORY);
+        db.close();
     }
 }

@@ -47,7 +47,7 @@ public class ResultActivity extends AppCompatActivity {
             historyId = db.addResult(score);
         }
 
-        tvStatus.setText("MỨC ĐỘ: " + levelName + " (Điểm: " + score + ")");
+        tvStatus.setText("MỨC ĐỘ: " + levelName + " (" + score + "%)");
         tvAnalysis.setText(analysis);
 
         btnGoTherapy.setOnClickListener(v -> {
@@ -99,6 +99,8 @@ public class ResultActivity extends AppCompatActivity {
         chart.setData(lineData);
 
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        chart.getAxisLeft().setAxisMinimum(0f);
+        chart.getAxisLeft().setAxisMaximum(100f);
         chart.getXAxis().setDrawGridLines(false);
         chart.getAxisRight().setEnabled(false);
         chart.getDescription().setEnabled(false);
