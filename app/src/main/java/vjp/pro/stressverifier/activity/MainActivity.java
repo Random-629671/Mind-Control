@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private Button btnViewHistory;
     private ImageButton btnSettings;
     private TextView tvSummary;
-    private View viewBackgroundCircle;
 
     private boolean isUseAI = false;
 
@@ -81,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (history.isEmpty()) {
             tvSummary.setText("Chưa có dữ liệu. Hãy làm bài test đầu tiên!");
-            //setEclipseColor(StressLevel.NONE.color);
             return;
         }
 
@@ -101,26 +99,7 @@ public class MainActivity extends AppCompatActivity {
         tvSummary.setText("TB 5 lần gần nhất: " + percentage + "%\nTình trạng: " + level.label);
         tvSummary.setTextColor(level.color);
 
-        //setEclipseColor(level.color);
         btnStartSurvey.setCardBackgroundColor(level.color);
-    }
-
-    // Todo / Error: This func broken!
-    // Warn: It cause crash, not use it!
-    private void setEclipseColor(int color) {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        float radius = displayMetrics.widthPixels / 1.5f;
-
-        int alphaColor = Color.argb(120, Color.red(color), Color.green(color), Color.blue(color));
-
-        GradientDrawable gd = new GradientDrawable();
-        gd.setShape(GradientDrawable.OVAL);
-        gd.setGradientType(GradientDrawable.RADIAL_GRADIENT);
-        gd.setGradientRadius(radius);
-        gd.setColors(new int[]{ Color.TRANSPARENT, alphaColor, Color.TRANSPARENT });
-
-        viewBackgroundCircle.setBackground(gd);
     }
 
     private void showSettingsDialog() {
